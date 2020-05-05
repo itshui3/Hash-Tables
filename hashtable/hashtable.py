@@ -3,7 +3,7 @@ class HashTableEntry:
     Hash Table entry, as a linked list node.
     """
 
-    def __init__(self, key, value):
+    def __init__(self, key, value): # Value is 
         self.key = key
         self.value = value
         self.next = None
@@ -17,7 +17,9 @@ class HashTable:
     Implement this.
     """
     def __init__(self, capacity):
-        
+        self.capacity = capacity
+        # I may need a reference to the SLL (or list)
+        self.storage = [None] * capacity
 
     def fnv1(self, key):
         """
@@ -32,6 +34,17 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
+        hash = 5381
+        for l in key:
+            hash = hash*33 + ord(l)
+        return hash
+
+    # def myHashFn(self, key):
+    #     # assuming key is the thing I need to convert into a value
+    #     total = 0
+    #     for l in key:
+    #         total += ord(l)
+    #     return total % self.capacity
 
     def hash_index(self, key):
         """
