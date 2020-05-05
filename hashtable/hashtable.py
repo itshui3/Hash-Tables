@@ -16,6 +16,8 @@ class HashTable:
 
     Implement this.
     """
+    def __init__(self, capacity):
+        
 
     def fnv1(self, key):
         """
