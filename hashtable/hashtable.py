@@ -34,17 +34,17 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        hash = 5381
+        h = 5381
         for l in key:
-            hash = hash*33 + ord(l)
-        return hash
+            h = (( h << 5) + h) + ord(l)
+        return h & 0xffffffff
 
-    # def myHashFn(self, key):
-    #     # assuming key is the thing I need to convert into a value
-    #     total = 0
-    #     for l in key:
-    #         total += ord(l)
-    #     return total % self.capacity
+    def myHashFn(self, key):
+        # assuming key is the thing I need to convert into a value
+        total = 0
+        for l in key:
+            total += ord(l)
+        return total % self.capacity
 
     def hash_index(self, key):
         """
@@ -52,7 +52,9 @@ class HashTable:
         between within the storage capacity of the hash table.
         """
         #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        h = self.djb2(key)
+        index = h % self.capacity
+        return index
 
     def put(self, key, value):
         """
@@ -62,6 +64,25 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+
+        cur = self.storage[index]
+
+        if cur is None:
+            self.storage[index] = HashTableEntry(key, value)
+            return
+
+        if cur.key == key:
+            cur.value = value
+            return
+
+        while cur.next is not None:
+            if cur.next.key == key:
+                cur.next.value = value
+                return
+            cur = cur.next
+        
+        cur.next = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -71,6 +92,19 @@ class HashTable:
 
         Implement this.
         """
+        cur = self.storage[self.hash_index(key)]
+        
+        while cur.key != key:
+            if cur.next is None:
+                return False
+            cur = cur.next
+
+        curvalue = None
+        if cur.key == key:
+            curvalue = cur.value
+            cur.value = None
+
+        return curvalue
 
     def get(self, key):
         """
@@ -80,14 +114,44 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
 
-    def resize(self):
+        cur = self.storage[index]
+
+        if cur is None:
+            return False
+        while cur.key != key:
+            if cur.next is None:
+                return False
+            cur = cur.next
+
+        return cur.value
+
+    def resize(self, capacity=None):
         """
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
 
         Implement this.
         """
+        if capacity is not None:
+            self.capacity = capacity
+        else:
+            self.capacity = self.capacity * 2
+        tempStor = self.storage
+
+        self.storage = [None] * self.capacity
+
+        for i in tempStor:
+            r = i
+
+            while r is not None:
+                prev = r
+                r = prev.next
+                prev.next = None
+
+                self.put(prev.key, prev.value)
+
 
 if __name__ == "__main__":
     ht = HashTable(2)
