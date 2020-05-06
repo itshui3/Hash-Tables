@@ -163,7 +163,11 @@ class HashTable:
         elif self.getLF() > 0.7:
             self.capacity = self.capacity * 2
         elif self.getLF() < 0.2:
-            self.capacity = self.capacity / 2
+            if self.capacity < 16:
+                self.capacity = 8
+            else:
+                self.capacity = self.capacity / 2
+
         tempStor = self.storage
 
         self.storage = [None] * self.capacity
