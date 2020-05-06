@@ -70,6 +70,9 @@ class HashTable:
 
         if cur is None:
             self.storage[index] = HashTableEntry(key, value)
+            loadFactor = self.getSize() / self.capacity
+            if loadFactor > 0.7:
+                self.resize()
             return
 
         if cur.key == key:
@@ -83,6 +86,10 @@ class HashTable:
             cur = cur.next
         
         cur.next = HashTableEntry(key, value)
+
+        loadFactor = self.getSize() / self.capacity
+        if loadFactor > 0.7:
+            self.resize()
 
     def delete(self, key):
         """
@@ -103,6 +110,10 @@ class HashTable:
         if cur.key == key:
             curvalue = cur.value
             cur.value = None
+
+        loadFactor = self.getSize() / self.capacity
+        if loadFactor > 0.7:
+            self.resize()
 
         return curvalue
 
@@ -126,6 +137,18 @@ class HashTable:
             cur = cur.next
 
         return cur.value
+    
+    def getSize(self):
+        size = 0
+        for i in self.storage:
+            r = i
+            while r is not None:
+                size += 1
+                if r.next is None:
+                    break
+                else:
+                    r = r.next
+        return size
 
     def resize(self, capacity=None):
         """
