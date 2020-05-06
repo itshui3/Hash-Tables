@@ -20,6 +20,7 @@ class HashTable:
         self.capacity = capacity
         # I may need a reference to the SLL (or list)
         self.storage = [None] * capacity
+        self.load = 0
 
     def fnv1(self, key):
         """
@@ -64,31 +65,25 @@ class HashTable:
 
         Implement this.
         """
-        index = self.hash_index(key)
+        cur = self.storage[self.hash_index(key)]
+        prev = None
 
-        cur = self.storage[index]
-
-        if cur is None:
-            self.storage[index] = HashTableEntry(key, value)
-            loadFactor = self.getSize() / self.capacity
-            if loadFactor > 0.7:
-                self.resize()
-            return
-
-        if cur.key == key:
-            cur.value = value
-            return
-
-        while cur.next is not None:
-            if cur.next.key == key:
-                cur.next.value = value
-                return
+        while cur != None:
+            if cur.key == key:
+                break
+            prev = cur
             cur = cur.next
-        
-        cur.next = HashTableEntry(key, value)
 
-        loadFactor = self.getSize() / self.capacity
-        if loadFactor > 0.7:
+        if cur == None:
+            if prev == None:
+                self.storage[self.hash_index(key)] = HashTableEntry(key, value)  
+            else:
+                prev.next = HashTableEntry(key, value)
+            self.load += 1
+        elif cur.key == key:
+            cur.value = value
+
+        if self.getLF() > 0.7:
             self.resize()
 
     def delete(self, key):
@@ -110,9 +105,12 @@ class HashTable:
         if cur.key == key:
             curvalue = cur.value
             cur.value = None
+            self.load -= 1
+        else:
+            return False # Test if False works as well as None
 
-        loadFactor = self.getSize() / self.capacity
-        if loadFactor > 0.7:
+        # loadFactor = self.getSize() / self.capacity
+        if self.getLF() > 0.7:
             self.resize()
 
         return curvalue
@@ -150,6 +148,9 @@ class HashTable:
                     r = r.next
         return size
 
+    def getLF(self):
+        return self.load / self.capacity
+
     def resize(self, capacity=None):
         """
         Doubles the capacity of the hash table and
@@ -159,8 +160,10 @@ class HashTable:
         """
         if capacity is not None:
             self.capacity = capacity
-        else:
+        elif self.getLF() > 0.7:
             self.capacity = self.capacity * 2
+        elif self.getLF() < 0.2:
+            self.capacity = self.capacity / 2
         tempStor = self.storage
 
         self.storage = [None] * self.capacity
