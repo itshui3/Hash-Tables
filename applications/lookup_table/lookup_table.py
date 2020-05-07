@@ -1,14 +1,24 @@
 import math
 import random
 
-def slowfun(x, y):
+def slowfun(x, y, cache={}):
     # TODO: Modify to produce the same results, but much faster
-    v = math.pow(x, y)
-    v = math.factorial(v)
+    if ('pow', x, y) not in cache:
+        cache[('pow', x, y)] = math.pow(x, y)
+    v = cache[('pow', x, y)]
+
+    if ('fac', x, y) not in cache:
+        cache[('fac', v)] = math.factorial(v)
+    v = cache[('fac', v)]
+
     v //= (x + y)
+
     v %= 982451653
 
     return v
+
+# If we build a look-up table for each calculation
+# We can store keys as either single values or tuples
 
 
 # Do not modify below this line!

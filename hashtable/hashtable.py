@@ -110,7 +110,7 @@ class HashTable:
             return False # Test if False works as well as None
 
         # loadFactor = self.getSize() / self.capacity
-        if self.getLF() > 0.7:
+        if self.getLF() < 0.2:
             self.resize()
 
         return curvalue
@@ -160,26 +160,25 @@ class HashTable:
         """
         if capacity is not None:
             self.capacity = capacity
+
         elif self.getLF() > 0.7:
             self.capacity = self.capacity * 2
+
         elif self.getLF() < 0.2:
             if self.capacity < 16:
                 self.capacity = 8
             else:
-                self.capacity = self.capacity / 2
+                self.capacity = self.capacity // 2
 
         tempStor = self.storage
-
         self.storage = [None] * self.capacity
 
         for i in tempStor:
             r = i
-
             while r is not None:
                 prev = r
                 r = prev.next
                 prev.next = None
-
                 self.put(prev.key, prev.value)
 
 
