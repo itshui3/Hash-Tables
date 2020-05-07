@@ -1,15 +1,8 @@
 def word_count(s, cache=None):
     # Implement me.
     cache = {}
-
-    s_arr = s.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').split(' ')
-
-    print(s_arr)
-    x_arr = []
-    for i in s_arr:
-        i.replace('\t', '')
     
-    sanitized = map(lambda i : i.strip('":;,.-+=/\\|[]{}()*^&').lower(), s_arr)
+    sanitized = map(lambda i : i.strip('":;,.-+=/\\|[]{}()*^&').lower(), s.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').split(' '))
 
     for i in sanitized:
         if i == "":
